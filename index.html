@@ -3,32 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>타로 카드 선택</title>
-    <!-- @description 메인 스타일시트 -->
+    <title>타로클릭 - 타로 카드 선택 서비스</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <h1>'타로클릭'에 오신 걸 환영합니다. <span style="font-size: 17px; color: #4CAF50;">(아래 녹색 버튼을 클릭하세요)</span></h1>
-        <!-- @description 선택 가능한 카드 섹션 -->
-        <div class="card-section">
-            <div class="section-header">
-                <h2>선택 가능한 카드</h2>
-                <!-- @description 카드 펼치기 버튼 -->
-                <button id="fanOutButton" class="fan-out-button">카드 펼치기 [클릭]</button>
-                <div id="selection-message" style="font-size: 18px; color: #333; margin-top: 0px; text-align: left;"></div>
+        <!-- 1. 인사말 -->
+        <header class="welcome-section">
+            <h1>"타로클릭"에 오신 걸 환영합니다.</h1>
+        </header>
+
+        <!-- 2. 타로 덱 선택 -->
+        <section class="deck-selection">
+            <h2>타로 덱 선택</h2>
+            <div class="decks">
+                <div class="deck">
+                    <div class="deck-title">
+                        <input type="radio" id="rider-waite" name="deck" value="RW" checked>
+                        <label for="rider-waite">라이더 웨이트</label>
+                    </div>
+                    <div class="deck-examples">
+                        <img src="RW_images/card_00.jpg" alt="라이더 웨이트 예시 1">
+                        <img src="RW_images/card_01.jpg" alt="라이더 웨이트 예시 2">
+                        <img src="RW_images/card_02.jpg" alt="라이더 웨이트 예시 3">
+                    </div>
+                </div>
+                
+                <div class="deck">
+                    <div class="deck-title">
+                        <input type="radio" id="marseille" name="deck" value="MS">
+                        <label for="marseille">마르세유</label>
+                    </div>
+                    <div class="deck-examples">
+                        <img src="MS_images/card_00.jpg" alt="마르세유 예시 1">
+                        <img src="MS_images/card_01.jpg" alt="마르세유 예시 2">
+                        <img src="MS_images/card_02.jpg" alt="마르세유 예시 3">
+                    </div>
+                </div>
             </div>
-            
-            <!-- @description 카드 컨테이너 -->
-            <div id="card-container"></div>
-        </div>
-        <!-- @description 선택된 카드 섹션 -->
-        <div class="card-section">
+        </section>
+
+        <!-- 3. 카드 선택하기 -->
+        <section class="card-selection">
+            <div class="section-header">
+                <h2>카드 선택하기</h2>
+                <div id="shuffleContainer" class="hidden">
+                    <img id="newShuffle" src="images/cards_newClick.jpg" alt="카드 다시 펼치기">
+                </div>
+            </div>
+            <div id="initialClickContainer">
+                <img id="initialClick" src="images/cards_click.jpg" alt="카드 펼치기">
+            </div>
+            <div id="cardsContainer" class="cards-grid hidden"></div>
+        </section>
+
+        <!-- 4. 선택된 카드 -->
+        <section class="selected-cards">
             <h2>선택된 카드</h2>
-            <div id="selected-cards"></div>
-        </div>
+            <div id="selectedCardsContainer" class="selected-cards-list"></div>
+        </section>
+
+        <!-- 5. 선택된 카드 전달하기 -->
+        <section class="share-section">
+            <h2>선택된 카드 전달하기</h2>
+            <p>아래 "선택된 카드 전달" 버튼을 누릅니다. 그 뒤에 "타로클릭" 오픈 채팅방 대화창에서 "붙여넣기"를 해주세요.</p>
+            <button id="shareButton" class="share-button">선택된 카드 전달</button>
+        </section>
     </div>
-    <!-- @description 메인 자바스크립트 -->
+
     <script src="script.js"></script>
 </body>
-</html>
+</html> 

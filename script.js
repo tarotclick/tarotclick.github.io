@@ -1,154 +1,281 @@
 /**
- * @fileoverview 타로 카드 선택 애플리케이션의 메인 자바스크립트 파일
- * @author Your Name
+ * 타로클릭 - 타로 카드 선택 웹앱
+ * 바닐라 자바스크립트로 구현된 타로 카드 선택 및 공유 웹앱
  */
 
 /**
- * @type {HTMLElement} 카드 컨테이너 요소
+ * 전역 변수 및 상태
  */
-const cardContainer = document.getElementById('card-container');
+const state = {
+  /** @type {string} 선택된 덱 (RW: 라이더 웨이트, MS: 마르세유) */
+  selectedDeck: 'RW',
+  
+  /** @type {number[]} 선택된 카드 ID 배열 */
+  selectedCards: [],
+  
+  /** @type {number} 최대 선택 가능한 카드 수 - 제한 없음 */
+  maxCards: 78
+};
 
 /**
- * @type {HTMLElement} 선택된 카드 컨테이너 요소
+ * 초기화 함수
  */
-const selectedCardsContainer = document.getElementById('selected-cards');
+function init() {
+  // 이벤트 리스너 등록
+  document.getElementById('rider-waite').addEventListener('change', handleDeckChange);
+  document.getElementById('marseille').addEventListener('change', handleDeckChange);
+  document.getElementById('initialClick').addEventListener('click', handleInitialClick);
+  document.getElementById('newShuffle').addEventListener('click', handleNewShuffle);
+  document.getElementById('shareButton').addEventListener('click', handleShareClick);
+  
+  // 초기 덱 설정
+  state.selectedDeck = document.querySelector('input[name="deck"]:checked').value;
+  
+  // 초기 화면 설정 - 항상 초기 화면으로 시작
+  resetToInitialState();
+}
 
 /**
- * @type {HTMLElement} 카드 펼치기 버튼 요소
+ * 덱 변경 핸들러
+ * @param {Event} event - 라디오 버튼 변경 이벤트
  */
-const fanOutButton = document.getElementById('fanOutButton');
+function handleDeckChange(event) {
+  state.selectedDeck = event.target.value;
+  
+  // 덱 변경 시 항상 초기 화면으로 리셋
+  resetToInitialState();
+}
 
 /**
- * @type {string[]} 카드 이미지 경로 배열
+ * 초기 상태로 리셋
  */
-const cards = Array.from({ length: 78 }, (_, i) => {
-    const cardNumber = i.toString().padStart(2, '0');
-    return `images/card_${cardNumber}.jpg`;
-});
+function resetToInitialState() {
+  // 선택된 카드 초기화
+  state.selectedCards = [];
+  
+  // 카드 컨테이너 숨기기
+  document.getElementById('cardsContainer').classList.add('hidden');
+  
+  // 카드 펼치기 이미지 표시
+  document.getElementById('initialClickContainer').classList.remove('hidden');
+  
+  // 다시 섞기 버튼 숨기기
+  document.getElementById('shuffleContainer').classList.add('hidden');
+  
+  // 선택된 카드 목록 비우기
+  updateSelectedCardsDisplay();
+}
 
 /**
- * 배열을 무작위로 섞는 함수
+ * 초기 카드 클릭 핸들러
+ */
+function handleInitialClick() {
+  document.getElementById('initialClickContainer').classList.add('hidden');
+  document.getElementById('shuffleContainer').classList.remove('hidden');
+  document.getElementById('cardsContainer').classList.remove('hidden');
+  
+  displayCards();
+}
+
+/**
+ * 카드 다시 펼치기 핸들러
+ */
+function handleNewShuffle() {
+  // 선택된 카드 초기화
+  state.selectedCards = [];
+  updateSelectedCardsDisplay();
+  
+  // 카드 다시 펼치기
+  displayCards();
+}
+
+/**
+ * 카드 클릭 핸들러
+ * @param {number} cardId - 선택된 카드 ID
+ * @param {HTMLElement} cardElement - 클릭된 카드 요소
+ */
+function handleCardClick(cardId, cardElement) {
+  // 선택 개수 제한 없음 (0-78장)
+  
+  // 카드 ID 저장
+  state.selectedCards.push(cardId);
+  
+  // 선택된 카드 번호 표시
+  const cardNumber = document.createElement('div');
+  cardNumber.className = 'card-number';
+  cardNumber.textContent = state.selectedCards.length;
+  
+  // 카드 이미지 숨기기
+  cardElement.querySelector('img').style.display = 'none';
+  cardElement.appendChild(cardNumber);
+  
+  // 선택된 카드 목록 업데이트
+  updateSelectedCardsDisplay();
+}
+
+/**
+ * 배열 무작위 섞기
  * @param {Array} array - 섞을 배열
+ * @returns {Array} 섞인 배열
  */
 function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+/**
+ * 카드 펼치기
+ */
+function displayCards() {
+  const cardsContainer = document.getElementById('cardsContainer');
+  cardsContainer.innerHTML = '';
+  
+  // 0-77까지의 카드 ID 배열 생성
+  const cardIds = Array.from({ length: 78 }, (_, i) => i);
+  
+  // 카드 배열 무작위로 섞기
+  const shuffledCardIds = shuffleArray(cardIds);
+  
+  // 무작위로 섞인 카드 78장 생성
+  shuffledCardIds.forEach(i => {
+    // 이미 선택한 카드는 표시하지 않음
+    if (state.selectedCards.includes(i)) {
+      const cardItem = document.createElement('div');
+      cardItem.className = 'card-item';
+      const cardNumber = document.createElement('div');
+      cardNumber.className = 'card-number';
+      cardNumber.textContent = state.selectedCards.indexOf(i) + 1;
+      cardItem.appendChild(cardNumber);
+      cardsContainer.appendChild(cardItem);
+      return;
     }
-}
-
-/**
- * 카드 요소를 생성하는 함수
- * @param {string} src - 카드 이미지 경로
- * @param {number} index - 카드 인덱스
- * @param {number} total - 전체 카드 수
- * @returns {HTMLElement} 생성된 카드 요소
- */
-function createCard(src, index, total) {
-    const card = document.createElement('div');
-    card.className = 'card';
     
-    const angle = (index - (total - 1) / 2) * 2.25;
-    card.style.setProperty('--angle', `${angle}deg`);
+    const cardItem = document.createElement('div');
+    cardItem.className = 'card-item';
     
-    const cardInner = document.createElement('div');
-    cardInner.className = 'card-inner';
+    const cardImg = document.createElement('img');
+    // 카드 뒷면 이미지 사용
+    cardImg.src = `${state.selectedDeck}_images/card_back.jpg`;
+    cardImg.alt = `타로 카드 뒷면`;
+    cardImg.dataset.cardId = i; // 나중에 앞면 이미지를 보여줄 때 사용할 카드 ID 저장
     
-    const cardFront = document.createElement('div');
-    cardFront.className = 'card-front';
-    const img = document.createElement('img');
-    img.src = src;
-    cardFront.appendChild(img);
-    
-    const cardBack = document.createElement('div');
-    cardBack.className = 'card-back';
-    
-    cardInner.appendChild(cardFront);
-    cardInner.appendChild(cardBack);
-    card.appendChild(cardInner);
-    
-    return card;
-}
-
-/**
- * 카드를 펼치는 함수
- */
-function fanOutCards() {
-    fanOutButton.style.display = 'none';
-    cardContainer.innerHTML = '';
-    selectedCardsContainer.innerHTML = '';
-    
-    // 메시지 숨기기
-    const messageElement = document.getElementById('selection-message');
-    messageElement.style.display = 'none'; // 메시지를 숨김
-
-    shuffleArray(cards);
-    cards.forEach((cardSrc, index) => {
-        const card = createCard(cardSrc, index, cards.length);
-        card.addEventListener('click', () => selectCard(card));
-        cardContainer.appendChild(card);
-        
-        setTimeout(() => {
-            card.style.animation = `fanOut 1.5s ease-out forwards ${index * 22}ms`;
-        }, 100);
+    cardImg.addEventListener('click', () => {
+      handleCardClick(i, cardItem);
     });
     
-    const lastCardDelay = cards.length * 22 + 1500;
-    setTimeout(() => {
-        fanOutButton.textContent = '새롭게 카드 펼치기';
-        fanOutButton.style.display = 'block';
-    }, lastCardDelay);
+    cardItem.appendChild(cardImg);
+    cardsContainer.appendChild(cardItem);
+  });
 }
 
 /**
- * 카드를 선택하는 함수
- * @param {HTMLElement} card - 선택된 카드 요소
+ * 선택된 카드 목록 업데이트
  */
-function selectCard(card) {
-    card.removeEventListener('click', () => selectCard(card));
-    cardContainer.removeChild(card);
-    card.style.animation = 'none';
-    card.style.transform = 'none';
+function updateSelectedCardsDisplay() {
+  const selectedCardsContainer = document.getElementById('selectedCardsContainer');
+  selectedCardsContainer.innerHTML = '';
+  
+  if (state.selectedCards.length === 0) {
+    const emptyMessage = document.createElement('p');
+    emptyMessage.textContent = '선택된 카드가 없습니다.';
+    selectedCardsContainer.appendChild(emptyMessage);
+    return;
+  }
+  
+  state.selectedCards.forEach((cardId, index) => {
+    const cardContainer = document.createElement('div');
+    cardContainer.className = 'selected-card';
     
-    // 현재 선택된 카드의 수를 계산하여 번호 부여
-    const currentNumber = selectedCardsContainer.children.length + 1;
+    const cardImg = document.createElement('img');
+    const paddedIndex = cardId.toString().padStart(2, '0');
+    cardImg.src = `${state.selectedDeck}_images/card_${paddedIndex}.jpg`;
+    cardImg.alt = `선택된 카드 ${index + 1}`;
     
-    // 메시지 표시
-    const messageElement = document.getElementById('selection-message');
-    messageElement.innerHTML = `
-        <span style="font-weight: bold; font-size: 32px; color: #333;">${currentNumber}</span>장을 선택했습니다.
-        <button id="close-message" class="close-button" style="margin-left: 5px; background: none; border: 2px solid #333; color: #333; font-size: 20px; cursor: pointer; padding: 0 5px; border-radius: 5px;">X</button>
-    `; // 숫자 부분을 굵고 크게 설정
+    const cardPosition = document.createElement('div');
+    cardPosition.className = 'card-position';
+    cardPosition.textContent = index + 1;
     
-    messageElement.style.display = 'flex'; // 메시지를 보이도록 설정
-    
-    // X 버튼 클릭 이벤트 추가
-    document.getElementById('close-message').addEventListener('click', () => {
-        messageElement.style.display = 'none'; // 메시지를 숨김
-    });
-    
-    // 번호를 표시할 요소 생성
-    const numberElement = document.createElement('div');
-    numberElement.className = 'card-number';
-    numberElement.textContent = currentNumber;
-    
-    // 번호 요소를 카드의 맨 앞에 추가
-    card.insertBefore(numberElement, card.firstChild);
-    
-    // 선택된 카드 컨테이너에 카드 추가
-    selectedCardsContainer.appendChild(card);
-    
-    // 카드 클릭 시 뒤집기 기능 추가
-    card.addEventListener('click', () => flipCard(card));
+    cardContainer.appendChild(cardImg);
+    cardContainer.appendChild(cardPosition);
+    selectedCardsContainer.appendChild(cardContainer);
+  });
 }
 
 /**
- * 카드를 뒤집는 함수
- * @param {HTMLElement} card - 뒤집을 카드 요소
+ * 공유 버튼 클릭 핸들러
  */
-function flipCard(card) {
-    card.classList.toggle('flipped'); // 카드의 flipped 클래스를 토글하여 앞면과 뒷면을 전환
+function handleShareClick() {
+  if (state.selectedCards.length === 0) {
+    alert('선택된 카드가 없습니다.');
+    return;
+  }
+  
+  // URL 생성 (예: ?deck=RW&cards=01,15,27)
+  const baseUrl = window.location.href.split('?')[0];
+  const deck = state.selectedDeck;
+  const cards = state.selectedCards.map(id => id.toString().padStart(2, '0')).join(',');
+  const url = `${baseUrl}?deck=${deck}&cards=${cards}`;
+  
+  // bit.ly API를 이용한 단축 URL 생성은 실제 API 키가 필요하므로
+  // 여기서는 원본 URL을 클립보드에 복사하는 것으로 대체
+  
+  // 클립보드에 복사
+  copyToClipboard(url);
+  
+  // 사용자에게 알림
+  alert('선택된 카드 정보가 복사되었습니다. 원하는 곳에 붙여넣기 하세요.');
 }
 
-// 이벤트 리스너 등록
-fanOutButton.addEventListener('click', fanOutCards);
+/**
+ * 클립보드에 텍스트 복사
+ * @param {string} text - 복사할 텍스트
+ */
+function copyToClipboard(text) {
+  // 임시 textarea 생성
+  const tempTextArea = document.createElement('textarea');
+  tempTextArea.value = text;
+  tempTextArea.style.position = 'fixed';  // A
+  document.body.appendChild(tempTextArea);
+  
+  // 선택 및 복사
+  tempTextArea.select();
+  document.execCommand('copy');
+  
+  // 임시 요소 제거
+  document.body.removeChild(tempTextArea);
+}
+
+/**
+ * URL 파라미터에서 공유된 카드 정보 로드
+ */
+function loadSharedCards() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const deck = urlParams.get('deck');
+  const cards = urlParams.get('cards');
+  
+  if (deck && cards) {
+    // 덱 설정
+    state.selectedDeck = deck;
+    document.getElementById(deck === 'RW' ? 'rider-waite' : 'marseille').checked = true;
+    
+    // 카드 ID 설정
+    state.selectedCards = cards.split(',').map(card => parseInt(card, 10));
+    
+    // 카드 화면 업데이트
+    handleInitialClick();
+    updateSelectedCardsDisplay();
+    
+    // 자동 스크롤
+    document.querySelector('.selected-cards').scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+// 페이지 로드 시 초기화
+document.addEventListener('DOMContentLoaded', () => {
+  init();
+  loadSharedCards();
+}); 
