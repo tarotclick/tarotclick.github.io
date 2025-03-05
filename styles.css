@@ -197,8 +197,8 @@ img {
 
 .card-position {
     position: absolute;
-    top: 5px;
-    left: 5px;
+    top: 2px;
+    left: 2px;
     width: 20px;
     height: 20px;
     display: flex;
@@ -299,9 +299,11 @@ img {
     }
     
     .card-position {
-        width: 20px;
-        height: 20px;
-        font-size: 0.75rem;
+        width: 16px;
+        height: 16px;
+        font-size: 0.65rem;
+        top: 2px;
+        left: 2px;
     }
     
     .card-selection {
