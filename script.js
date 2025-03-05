@@ -94,22 +94,34 @@ function handleInitialClick() {
   // 카드 컨테이너를 표시 (카드는 아직 생성되지 않음)
   document.getElementById('cardsContainer').classList.remove('hidden');
   
-  // 1단계: '카드 선택하기' 섹션 위치로 즉시 이동
+  // '카드 선택하기' 섹션 위치로 이동 (모바일 및 데스크탑 환경 모두 고려)
   const cardSelectionSection = document.querySelector('.card-selection');
-  const sectionPosition = cardSelectionSection.getBoundingClientRect().top + window.pageYOffset;
   
-  // 즉시 스크롤 이동 (부드러운 스크롤 없이)
-  window.scrollTo(0, sectionPosition);
+  // 위치 계산 (상단에서 5px 여백을 둠)
+  const sectionPosition = cardSelectionSection.getBoundingClientRect().top + window.pageYOffset - 5;
   
-  // 2단계: 스크롤 이동 후 카드 펼치기 애니메이션 실행
+  // 즉시 스크롤 이동
+  window.scrollTo({
+    top: sectionPosition,
+    behavior: 'auto' // 즉시 이동
+  });
+  
+  // 약간의 지연 후 카드 표시 (iOS/Android 모두 호환)
   setTimeout(() => {
-    // 한번 더 위치 확인 및 스크롤 조정 (애니메이션 시작 전 정확한 위치에 있는지 확인)
-    const finalPosition = cardSelectionSection.getBoundingClientRect().top + window.pageYOffset;
-    window.scrollTo(0, finalPosition);
+    // 위치 재확인 (스크롤이 제대로 됐는지)
+    const finalPosition = cardSelectionSection.getBoundingClientRect().top + window.pageYOffset - 5;
+    
+    // 필요시 위치 재조정
+    if (Math.abs(finalPosition - sectionPosition) > 10) {
+      window.scrollTo({
+        top: finalPosition,
+        behavior: 'auto'
+      });
+    }
     
     // 카드 펼치기
     displayCards();
-  }, 100); // 짧은 지연 시간으로 설정
+  }, 150); // 모바일에서도 충분한 시간
 }
 
 /**
@@ -125,22 +137,34 @@ function handleNewShuffle() {
   document.getElementById('shareButton').classList.add('hidden');
   document.getElementById('shareButton').classList.remove('blinking');
   
-  // 1단계: '카드 선택하기' 섹션 위치로 즉시 이동
+  // '카드 선택하기' 섹션 위치로 이동 (모바일 및 데스크탑 환경 모두 고려)
   const cardSelectionSection = document.querySelector('.card-selection');
-  const sectionPosition = cardSelectionSection.getBoundingClientRect().top + window.pageYOffset;
   
-  // 즉시 스크롤 이동 (부드러운 스크롤 없이)
-  window.scrollTo(0, sectionPosition);
+  // 위치 계산 (상단에서 5px 여백을 둠)
+  const sectionPosition = cardSelectionSection.getBoundingClientRect().top + window.pageYOffset - 5;
   
-  // 2단계: 스크롤 이동 후 카드 펼치기 애니메이션 실행
+  // 즉시 스크롤 이동
+  window.scrollTo({
+    top: sectionPosition,
+    behavior: 'auto' // 즉시 이동
+  });
+  
+  // 약간의 지연 후 카드 표시 (iOS/Android 모두 호환)
   setTimeout(() => {
-    // 한번 더 위치 확인 및 스크롤 조정 (애니메이션 시작 전 정확한 위치에 있는지 확인)
-    const finalPosition = cardSelectionSection.getBoundingClientRect().top + window.pageYOffset;
-    window.scrollTo(0, finalPosition);
+    // 위치 재확인 (스크롤이 제대로 됐는지)
+    const finalPosition = cardSelectionSection.getBoundingClientRect().top + window.pageYOffset - 5;
+    
+    // 필요시 위치 재조정
+    if (Math.abs(finalPosition - sectionPosition) > 10) {
+      window.scrollTo({
+        top: finalPosition,
+        behavior: 'auto'
+      });
+    }
     
     // 카드 다시 펼치기
     displayCards();
-  }, 100); // 짧은 지연 시간으로 설정
+  }, 150); // 모바일에서도 충분한 시간
 }
 
 /**
