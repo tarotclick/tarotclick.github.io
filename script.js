@@ -31,6 +31,9 @@ function init() {
   document.getElementById('newShuffle').addEventListener('click', handleNewShuffle);
   document.getElementById('shareButton').addEventListener('click', handleShareClick);
   
+  // 공유 버튼 표시 (항상 보이도록 설정)
+  document.getElementById('shareButton').classList.remove('hidden');
+  
   // 초기 덱 설정
   state.selectedDeck = document.querySelector('input[name="deck"]:checked').value;
   
@@ -71,9 +74,10 @@ function resetToInitialState() {
   // 다시 섞기 버튼 숨기기
   document.getElementById('shuffleContainer').classList.add('hidden');
   
-  // 공유 버튼 숨기기
-  document.getElementById('shareButton').classList.add('hidden');
-  document.getElementById('shareButton').classList.remove('blinking');
+  // 공유 버튼 설정 - hidden 클래스는 추가하되 CSS에서 항상 표시되도록 함
+  const shareButton = document.getElementById('shareButton');
+  shareButton.classList.add('hidden'); // CSS에서 .hidden을 재정의하므로 시각적으로는 표시됨
+  shareButton.classList.remove('blinking');
   
   // 선택된 카드 목록 비우기
   updateSelectedCardsDisplay();
@@ -298,6 +302,11 @@ function displayCards() {
 function updateSelectedCardsDisplay(withAnimation = false) {
   const selectedCardsContainer = document.getElementById('selectedCardsContainer');
   selectedCardsContainer.innerHTML = '';
+  
+  // 공유 버튼 표시 (항상 보이도록 함)
+  const shareButton = document.getElementById('shareButton');
+  shareButton.classList.remove('hidden');
+  shareButton.classList.remove('blinking'); // 기존 깜빡임 효과 제거
   
   if (state.selectedCards.length === 0) {
     const emptyMessage = document.createElement('p');

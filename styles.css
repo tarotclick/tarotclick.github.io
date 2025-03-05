@@ -234,6 +234,7 @@ img {
     }
 }
 
+/* 공유 버튼 기본 스타일 - 항상 표시되도록 수정 */
 .share-button {
     background-color: #9acd32;
     color: white;
@@ -243,20 +244,40 @@ img {
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s;
+    display: inline-block !important; /* 항상 표시 */
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
 .share-button:hover {
     background-color: #8bb92d;
 }
 
-/* 깜빡임 효과가 적용된 버튼 */
+/* 깜빡임 효과가 적용된 버튼 - 모든 환경에서 동일하게 작동 */
 .share-button.blinking {
     animation: blink 2s infinite ease-in-out; /* 2초마다 천천히 깜빡임 */
+    display: inline-block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
-/* 유틸리티 클래스 */
+/* 선택된 카드 섹션 헤더 스타일 - 모든 화면 크기에서 동일하게 적용 */
+.selected-cards .section-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* 유틸리티 클래스 - 공유 버튼은 예외 처리 */
 .hidden {
     display: none;
+}
+
+/* 공유 버튼은 hidden 클래스가 있어도 표시되도록 함 */
+.share-button.hidden {
+    display: inline-block !important;
 }
 
 /* 미디어 쿼리 - 모바일 */
