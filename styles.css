@@ -262,14 +262,14 @@ img {
 /* 미디어 쿼리 - 모바일 */
 @media screen and (max-width: 767px) {
     .cards-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 6px;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 2px;
         padding-bottom: 20px;
     }
     
     .selected-cards-list {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 6px;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 2px;
     }
     
     .selected-card {
@@ -312,6 +312,19 @@ img {
     
     .container {
         padding: 10px;
+    }
+    
+    .card-item {
+        margin-bottom: 10px;
+    }
+    
+    .card-item img, .selected-card img {
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .card-front, .card-back {
+        border-radius: 5px;
     }
 }
 
