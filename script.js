@@ -190,21 +190,37 @@ function handleCardClick(cardId, cardElement) {
 }
 
 /**
- * 선택한 카드 뒤집기 핸들러
- * @param {HTMLElement} cardElement - 뒤집을 카드 요소
+ * 카드 뒤집기 핸들러
+ * @param {Element} cardElement - 뒤집을 카드 요소
  */
 function handleCardFlip(cardElement) {
-  if (!cardElement.classList.contains('flipped')) {
-    cardElement.classList.add('flipped');
-    state.flippedCards++;
+  // 이미 뒤집힌 카드인지 확인
+  if (cardElement.classList.contains('flipped')) {
+    return; // 이미 뒤집힌 카드는 무시
+  }
+  
+  // 카드 뒤집기
+  cardElement.classList.add('flipped');
+  
+  // 뒤집은 카드 수 증가
+  state.flippedCards++;
+  
+  // 모든 카드가 뒤집어졌는지 확인
+  if (state.flippedCards === state.selectedCards.length) {
+    // 모든 카드가 뒤집어졌을 때 공유 버튼 표시
+    const shareButton = document.getElementById('shareButton');
+    shareButton.classList.remove('hidden');
     
-    // 모든 카드가 뒤집혔는지 확인
-    if (state.flippedCards === state.selectedCards.length && state.selectedCards.length > 0) {
-      // 공유 버튼 표시 및 깜빡임 효과 추가
-      const shareButton = document.getElementById('shareButton');
-      shareButton.classList.remove('hidden');
+    // 깜빡임 효과 추가
+    setTimeout(() => {
       shareButton.classList.add('blinking');
-    }
+      
+      // 모바일 환경에서 버튼이 보이도록 화면 스크롤
+      if (window.innerWidth <= 767) {
+        const selectedCardsSection = document.querySelector('.selected-cards');
+        selectedCardsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 500);
   }
 }
 

@@ -282,20 +282,42 @@ img {
         align-items: flex-start;
     }
     
+    .card-selection .section-header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+    
     .section-header h2 {
         margin-bottom: 10px;
+    }
+    
+    .card-selection .section-header h2 {
+        margin-bottom: 0;
     }
     
     .share-button {
         padding: 8px 16px;
         font-size: 0.9rem;
-        display: inline-block;
+        display: inline-block !important;
         margin-top: 5px;
+        width: auto;
     }
     
     .share-button.blinking {
         animation: blink 2s infinite ease-in-out;
         display: inline-block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+    
+    .selected-cards .section-header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
     }
     
     .card-position {
