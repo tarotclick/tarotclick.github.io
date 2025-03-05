@@ -412,6 +412,30 @@ function handleShareClick() {
     return;
   }
   
+  // 모든 카드가 뒤집혔는지 확인
+  if (state.flippedCards < state.selectedCards.length) {
+    // 뒤집히지 않은 카드가 있을 경우 경고 메시지 표시
+    showCustomAlert('카드의 앞면을 모두 확인한 뒤에 복사해 주세요.');
+    
+    // 뒤집히지 않은 카드들을 시각적으로 강조
+    const selectedCards = document.querySelectorAll('.selected-card');
+    selectedCards.forEach(card => {
+      if (!card.classList.contains('flipped')) {
+        // 뒤집히지 않은 카드에 강조 효과 (살짝 흔들림)
+        card.animate([
+          { transform: 'translateX(-5px)' },
+          { transform: 'translateX(5px)' },
+          { transform: 'translateX(-5px)' }
+        ], {
+          duration: 300,
+          iterations: 2
+        });
+      }
+    });
+    
+    return;
+  }
+  
   // URL 생성 (예: ?deck=RW&cards=01,15,27)
   const baseUrl = window.location.href.split('?')[0];
   const deck = state.selectedDeck;
