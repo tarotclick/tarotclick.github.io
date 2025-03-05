@@ -46,7 +46,18 @@
             </div>
         </section>
 
-        <!-- 3. 카드 선택하기 -->
+        <!-- 3. 선택한 카드 (순서 변경됨) -->
+        <section class="selected-cards">
+            <div class="section-header">
+                <h2>선택한 카드</h2>
+                <button id="shareButton" class="share-button hidden">선택한 카드 복사</button>
+            </div>
+            <div id="selectedCardsContainer" class="selected-cards-list">
+                <p class="empty-selection-message">아래 '카드 선택하기'에서 이미지를 클릭하여 카드를 펼치고 선택하세요. 선택한 카드는 이곳에 나열됩니다.</p>
+            </div>
+        </section>
+
+        <!-- 4. 카드 선택하기 (순서 변경됨) -->
         <section class="card-selection">
             <div class="section-header">
                 <h2>카드 선택하기</h2>
@@ -54,23 +65,10 @@
                     <img id="newShuffle" src="images/cards_newClick.jpg" alt="카드 다시 펼치기">
                 </div>
             </div>
-            <div id="initialClickContainer">
+            <div id="initialClickContainer" class="initial-click-center">
                 <img id="initialClick" src="images/cards_click.jpg" alt="카드 펼치기">
             </div>
             <div id="cardsContainer" class="cards-grid hidden"></div>
-        </section>
-
-        <!-- 4. 선택된 카드 -->
-        <section class="selected-cards">
-            <h2>선택된 카드</h2>
-            <div id="selectedCardsContainer" class="selected-cards-list"></div>
-        </section>
-
-        <!-- 5. 선택된 카드 전달하기 -->
-        <section class="share-section">
-            <h2>선택된 카드 전달하기</h2>
-            <p>아래 "선택된 카드 전달" 버튼을 누릅니다. 그 뒤에 "타로클릭" 오픈 채팅방 대화창에서 "붙여넣기"를 해주세요.</p>
-            <button id="shareButton" class="share-button">선택된 카드 전달</button>
         </section>
     </div>
 

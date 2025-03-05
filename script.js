@@ -14,7 +14,10 @@ const state = {
   selectedCards: [],
   
   /** @type {number} 최대 선택 가능한 카드 수 - 제한 없음 */
-  maxCards: 78
+  maxCards: 78,
+  
+  /** @type {number} 현재 뒤집힌 카드 수 */
+  flippedCards: 0
 };
 
 /**
@@ -33,6 +36,9 @@ function init() {
   
   // 초기 화면 설정 - 항상 초기 화면으로 시작
   resetToInitialState();
+  
+  // URL 파라미터 확인 및 공유 카드 로드
+  loadSharedCards();
 }
 
 /**
@@ -52,15 +58,22 @@ function handleDeckChange(event) {
 function resetToInitialState() {
   // 선택된 카드 초기화
   state.selectedCards = [];
+  state.flippedCards = 0;
   
   // 카드 컨테이너 숨기기
   document.getElementById('cardsContainer').classList.add('hidden');
   
-  // 카드 펼치기 이미지 표시
-  document.getElementById('initialClickContainer').classList.remove('hidden');
+  // 카드 펼치기 이미지 표시 (display 속성도 초기화)
+  const initialClickContainer = document.getElementById('initialClickContainer');
+  initialClickContainer.style.display = '';
+  initialClickContainer.classList.remove('hidden');
   
   // 다시 섞기 버튼 숨기기
   document.getElementById('shuffleContainer').classList.add('hidden');
+  
+  // 공유 버튼 숨기기
+  document.getElementById('shareButton').classList.add('hidden');
+  document.getElementById('shareButton').classList.remove('blinking');
   
   // 선택된 카드 목록 비우기
   updateSelectedCardsDisplay();
@@ -70,11 +83,33 @@ function resetToInitialState() {
  * 초기 카드 클릭 핸들러
  */
 function handleInitialClick() {
-  document.getElementById('initialClickContainer').classList.add('hidden');
+  // 초기 카드 이미지 컨테이너를 완전히 숨김 (display: none 적용)
+  const initialClickContainer = document.getElementById('initialClickContainer');
+  initialClickContainer.style.display = 'none';
+  initialClickContainer.classList.add('hidden');
+  
+  // 다시 섞기 버튼을 표시
   document.getElementById('shuffleContainer').classList.remove('hidden');
+  
+  // 카드 컨테이너를 표시 (카드는 아직 생성되지 않음)
   document.getElementById('cardsContainer').classList.remove('hidden');
   
-  displayCards();
+  // 1단계: '카드 선택하기' 섹션 위치로 즉시 이동
+  const cardSelectionSection = document.querySelector('.card-selection');
+  const sectionPosition = cardSelectionSection.getBoundingClientRect().top + window.pageYOffset;
+  
+  // 즉시 스크롤 이동 (부드러운 스크롤 없이)
+  window.scrollTo(0, sectionPosition);
+  
+  // 2단계: 스크롤 이동 후 카드 펼치기 애니메이션 실행
+  setTimeout(() => {
+    // 한번 더 위치 확인 및 스크롤 조정 (애니메이션 시작 전 정확한 위치에 있는지 확인)
+    const finalPosition = cardSelectionSection.getBoundingClientRect().top + window.pageYOffset;
+    window.scrollTo(0, finalPosition);
+    
+    // 카드 펼치기
+    displayCards();
+  }, 100); // 짧은 지연 시간으로 설정
 }
 
 /**
@@ -83,10 +118,29 @@ function handleInitialClick() {
 function handleNewShuffle() {
   // 선택된 카드 초기화
   state.selectedCards = [];
+  state.flippedCards = 0;
   updateSelectedCardsDisplay();
   
-  // 카드 다시 펼치기
-  displayCards();
+  // 공유 버튼 숨기기
+  document.getElementById('shareButton').classList.add('hidden');
+  document.getElementById('shareButton').classList.remove('blinking');
+  
+  // 1단계: '카드 선택하기' 섹션 위치로 즉시 이동
+  const cardSelectionSection = document.querySelector('.card-selection');
+  const sectionPosition = cardSelectionSection.getBoundingClientRect().top + window.pageYOffset;
+  
+  // 즉시 스크롤 이동 (부드러운 스크롤 없이)
+  window.scrollTo(0, sectionPosition);
+  
+  // 2단계: 스크롤 이동 후 카드 펼치기 애니메이션 실행
+  setTimeout(() => {
+    // 한번 더 위치 확인 및 스크롤 조정 (애니메이션 시작 전 정확한 위치에 있는지 확인)
+    const finalPosition = cardSelectionSection.getBoundingClientRect().top + window.pageYOffset;
+    window.scrollTo(0, finalPosition);
+    
+    // 카드 다시 펼치기
+    displayCards();
+  }, 100); // 짧은 지연 시간으로 설정
 }
 
 /**
@@ -95,8 +149,6 @@ function handleNewShuffle() {
  * @param {HTMLElement} cardElement - 클릭된 카드 요소
  */
 function handleCardClick(cardId, cardElement) {
-  // 선택 개수 제한 없음 (0-78장)
-  
   // 카드 ID 저장
   state.selectedCards.push(cardId);
   
@@ -109,8 +161,27 @@ function handleCardClick(cardId, cardElement) {
   cardElement.querySelector('img').style.display = 'none';
   cardElement.appendChild(cardNumber);
   
-  // 선택된 카드 목록 업데이트
-  updateSelectedCardsDisplay();
+  // 선택된 카드 목록 업데이트 - 애니메이션 적용
+  updateSelectedCardsDisplay(true);
+}
+
+/**
+ * 선택한 카드 뒤집기 핸들러
+ * @param {HTMLElement} cardElement - 뒤집을 카드 요소
+ */
+function handleCardFlip(cardElement) {
+  if (!cardElement.classList.contains('flipped')) {
+    cardElement.classList.add('flipped');
+    state.flippedCards++;
+    
+    // 모든 카드가 뒤집혔는지 확인
+    if (state.flippedCards === state.selectedCards.length && state.selectedCards.length > 0) {
+      // 공유 버튼 표시 및 깜빡임 효과 추가
+      const shareButton = document.getElementById('shareButton');
+      shareButton.classList.remove('hidden');
+      shareButton.classList.add('blinking');
+    }
+  }
 }
 
 /**
@@ -140,69 +211,156 @@ function displayCards() {
   // 카드 배열 무작위로 섞기
   const shuffledCardIds = shuffleArray(cardIds);
   
-  // 무작위로 섞인 카드 78장 생성
-  shuffledCardIds.forEach(i => {
+  // 애니메이션 딜레이 설정 (각 카드마다 0.05초씩 증가)
+  const delayIncrement = 0.05; // 카드마다 0.05초씩 증가
+  
+  // 무작위로 섞인 카드를 하나씩 순차적으로 추가
+  shuffledCardIds.forEach((i, index) => {
     // 이미 선택한 카드는 표시하지 않음
     if (state.selectedCards.includes(i)) {
-      const cardItem = document.createElement('div');
-      cardItem.className = 'card-item';
-      const cardNumber = document.createElement('div');
-      cardNumber.className = 'card-number';
-      cardNumber.textContent = state.selectedCards.indexOf(i) + 1;
-      cardItem.appendChild(cardNumber);
-      cardsContainer.appendChild(cardItem);
+      setTimeout(() => {
+        const cardItem = document.createElement('div');
+        cardItem.className = 'card-item';
+        const cardNumber = document.createElement('div');
+        cardNumber.className = 'card-number';
+        cardNumber.textContent = state.selectedCards.indexOf(i) + 1;
+        cardItem.appendChild(cardNumber);
+        cardsContainer.appendChild(cardItem);
+      }, index * delayIncrement * 1000); // 밀리초 단위로 변환
       return;
     }
     
-    const cardItem = document.createElement('div');
-    cardItem.className = 'card-item';
-    
-    const cardImg = document.createElement('img');
-    // 카드 뒷면 이미지 사용
-    cardImg.src = `${state.selectedDeck}_images/card_back.jpg`;
-    cardImg.alt = `타로 카드 뒷면`;
-    cardImg.dataset.cardId = i; // 나중에 앞면 이미지를 보여줄 때 사용할 카드 ID 저장
-    
-    cardImg.addEventListener('click', () => {
-      handleCardClick(i, cardItem);
-    });
-    
-    cardItem.appendChild(cardImg);
-    cardsContainer.appendChild(cardItem);
+    // 각 카드를 일정 시간 간격으로 추가
+    setTimeout(() => {
+      const cardItem = document.createElement('div');
+      cardItem.className = 'card-item';
+      
+      const cardImg = document.createElement('img');
+      // 카드 뒷면 이미지 사용
+      cardImg.src = `${state.selectedDeck}_images/card_back.jpg`;
+      cardImg.alt = `타로 카드 뒷면`;
+      cardImg.dataset.cardId = i; // 나중에 앞면 이미지를 보여줄 때 사용할 카드 ID 저장
+      
+      cardImg.addEventListener('click', () => {
+        handleCardClick(i, cardItem);
+      });
+      
+      cardItem.appendChild(cardImg);
+      cardsContainer.appendChild(cardItem);
+    }, index * delayIncrement * 1000); // 밀리초 단위로 변환
   });
 }
 
 /**
  * 선택된 카드 목록 업데이트
+ * @param {boolean} withAnimation - 애니메이션 적용 여부
  */
-function updateSelectedCardsDisplay() {
+function updateSelectedCardsDisplay(withAnimation = false) {
   const selectedCardsContainer = document.getElementById('selectedCardsContainer');
   selectedCardsContainer.innerHTML = '';
   
   if (state.selectedCards.length === 0) {
     const emptyMessage = document.createElement('p');
-    emptyMessage.textContent = '선택된 카드가 없습니다.';
+    emptyMessage.className = 'empty-selection-message';
+    emptyMessage.textContent = '아래 \'카드 선택하기\'에서 이미지를 클릭하여 카드를 펼치고 선택하세요. 선택한 카드는 이곳에 나열됩니다.';
     selectedCardsContainer.appendChild(emptyMessage);
     return;
   }
+  
+  // 기존 애니메이션 딜레이를 위한 카운터
+  let delay = 0;
   
   state.selectedCards.forEach((cardId, index) => {
     const cardContainer = document.createElement('div');
     cardContainer.className = 'selected-card';
     
-    const cardImg = document.createElement('img');
-    const paddedIndex = cardId.toString().padStart(2, '0');
-    cardImg.src = `${state.selectedDeck}_images/card_${paddedIndex}.jpg`;
-    cardImg.alt = `선택된 카드 ${index + 1}`;
+    if (withAnimation) {
+      // 행과 열을 기준으로 애니메이션 딜레이 설정 (카드 선택하기와 일관성 유지)
+      const row = Math.floor(index / 6);
+      const col = index % 6;
+      delay = row * 0.2 + col * 0.05; // 행간 0.2초, 열간 0.05초 딜레이
+      cardContainer.style.animationDelay = `${delay}s`;
+      cardContainer.style.animation = 'fadeIn 0.3s ease-out backwards';
+    }
     
+    // 카드 앞면 (처음에는 안 보임)
+    const cardFront = document.createElement('div');
+    cardFront.className = 'card-front';
+    const frontImg = document.createElement('img');
+    const paddedIndex = cardId.toString().padStart(2, '0');
+    frontImg.src = `${state.selectedDeck}_images/card_${paddedIndex}.jpg`;
+    frontImg.alt = `선택한 카드 ${index + 1}`;
+    cardFront.appendChild(frontImg);
+    
+    // 카드 뒷면 (처음에 보임)
+    const cardBack = document.createElement('div');
+    cardBack.className = 'card-back';
+    const backImg = document.createElement('img');
+    backImg.src = `${state.selectedDeck}_images/card_back.jpg`;
+    backImg.alt = `선택한 카드 뒷면 ${index + 1}`;
+    cardBack.appendChild(backImg);
+    
+    // 카드 위치 표시
     const cardPosition = document.createElement('div');
     cardPosition.className = 'card-position';
     cardPosition.textContent = index + 1;
     
-    cardContainer.appendChild(cardImg);
+    // 뒤집기 이벤트 리스너 추가
+    cardContainer.addEventListener('click', () => {
+      handleCardFlip(cardContainer);
+    });
+    
+    cardContainer.appendChild(cardFront);
+    cardContainer.appendChild(cardBack);
     cardContainer.appendChild(cardPosition);
     selectedCardsContainer.appendChild(cardContainer);
   });
+}
+
+/**
+ * 커스텀 알림창 표시
+ * @param {string} message - 표시할 메시지
+ * @param {Function} callback - 확인 버튼 클릭 시 실행할 콜백 함수
+ */
+function showCustomAlert(message, callback) {
+  // 오버레이 생성
+  const overlay = document.createElement('div');
+  overlay.className = 'custom-alert-overlay';
+  
+  // 알림창 컨테이너 생성
+  const alertBox = document.createElement('div');
+  alertBox.className = 'custom-alert';
+  
+  // 메시지 생성
+  const alertMessage = document.createElement('div');
+  alertMessage.className = 'custom-alert-message';
+  alertMessage.textContent = message;
+  
+  // 확인 버튼 생성
+  const alertButton = document.createElement('button');
+  alertButton.className = 'custom-alert-button';
+  alertButton.textContent = '확인';
+  alertButton.addEventListener('click', () => {
+    // 알림창 닫기
+    document.body.removeChild(overlay);
+    document.body.removeChild(alertBox);
+    
+    // 콜백 실행
+    if (typeof callback === 'function') {
+      callback();
+    }
+  });
+  
+  // 알림창 구성
+  alertBox.appendChild(alertMessage);
+  alertBox.appendChild(alertButton);
+  
+  // DOM에 추가
+  document.body.appendChild(overlay);
+  document.body.appendChild(alertBox);
+  
+  // 버튼에 포커스
+  alertButton.focus();
 }
 
 /**
@@ -210,7 +368,7 @@ function updateSelectedCardsDisplay() {
  */
 function handleShareClick() {
   if (state.selectedCards.length === 0) {
-    alert('선택된 카드가 없습니다.');
+    showCustomAlert('선택한 카드가 없습니다.');
     return;
   }
   
@@ -220,14 +378,11 @@ function handleShareClick() {
   const cards = state.selectedCards.map(id => id.toString().padStart(2, '0')).join(',');
   const url = `${baseUrl}?deck=${deck}&cards=${cards}`;
   
-  // bit.ly API를 이용한 단축 URL 생성은 실제 API 키가 필요하므로
-  // 여기서는 원본 URL을 클립보드에 복사하는 것으로 대체
-  
   // 클립보드에 복사
   copyToClipboard(url);
   
   // 사용자에게 알림
-  alert('선택된 카드 정보가 복사되었습니다. 원하는 곳에 붙여넣기 하세요.');
+  showCustomAlert('선택한 카드 정보가 복사되었습니다. 원하는 곳에 붙여넣기 하세요.');
 }
 
 /**
@@ -238,7 +393,7 @@ function copyToClipboard(text) {
   // 임시 textarea 생성
   const tempTextArea = document.createElement('textarea');
   tempTextArea.value = text;
-  tempTextArea.style.position = 'fixed';  // A
+  tempTextArea.style.position = 'fixed';
   document.body.appendChild(tempTextArea);
   
   // 선택 및 복사
@@ -250,7 +405,7 @@ function copyToClipboard(text) {
 }
 
 /**
- * URL 파라미터에서 공유된 카드 정보 로드
+ * URL 파라미터로부터 공유된 카드 로드
  */
 function loadSharedCards() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -260,22 +415,40 @@ function loadSharedCards() {
   if (deck && cards) {
     // 덱 설정
     state.selectedDeck = deck;
-    document.getElementById(deck === 'RW' ? 'rider-waite' : 'marseille').checked = true;
+    document.querySelector(`input[value="${deck}"]`).checked = true;
     
-    // 카드 ID 설정
-    state.selectedCards = cards.split(',').map(card => parseInt(card, 10));
+    // 카드 선택
+    const cardIds = cards.split(',').map(id => parseInt(id, 10));
+    state.selectedCards = cardIds;
     
-    // 카드 화면 업데이트
-    handleInitialClick();
+    // 공유된 카드는 이미 모두 뒤집힌 상태로 표시
+    state.flippedCards = cardIds.length;
+    
+    // 카드 표시 업데이트
+    document.getElementById('initialClickContainer').classList.add('hidden');
+    document.getElementById('shuffleContainer').classList.remove('hidden');
+    
+    // 선택된 카드 업데이트
     updateSelectedCardsDisplay();
     
-    // 자동 스크롤
-    document.querySelector('.selected-cards').scrollIntoView({ behavior: 'smooth' });
+    // 이미 뒤집힌 상태로 만들기
+    setTimeout(() => {
+      const selectedCards = document.querySelectorAll('.selected-card');
+      selectedCards.forEach(card => {
+        card.classList.add('flipped');
+      });
+      
+      // 공유 버튼 표시
+      if (state.selectedCards.length > 0) {
+        document.getElementById('shareButton').classList.remove('hidden');
+      }
+    }, 500);
+    
+    // 카드 펼치기
+    displayCards();
+    document.getElementById('cardsContainer').classList.remove('hidden');
   }
 }
 
 // 페이지 로드 시 초기화
-document.addEventListener('DOMContentLoaded', () => {
-  init();
-  loadSharedCards();
-}); 
+window.addEventListener('DOMContentLoaded', init); 

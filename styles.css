@@ -82,10 +82,10 @@ img {
 .section-header {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: space-between;
     gap: 15px;
     margin-bottom: 15px;
-    font-size: 0.9rem; /* 모바일에서 섹션 제목 글꼴 크기 축소 */
+    font-size: 0.9rem;
 }
 
 #initialClick, #newShuffle {
@@ -98,34 +98,42 @@ img {
 }
 
 .card-selection {
-    margin-bottom: 60px; /* 모바일에서 섹션 간 간격 적절히 조정 */
+    margin-bottom: 60px;
 }
 
 .cards-grid {
     display: grid;
-    grid-template-columns: repeat(6, 1fr); /* 모바일에서도 가로 6장으로 변경 */
-    gap: 4px; /* 간격 더 줄임 */
-    padding-bottom: 20px; /* 하단 여백 축소 */
+    grid-template-columns: repeat(6, 1fr);
+    gap: 4px;
+    padding-bottom: 20px;
 }
 
+/* 카드 아이템 기본 스타일 */
 .card-item {
     position: relative;
     text-align: center;
-    aspect-ratio: 3/5;  /* 카드 비율 유지 */
-    margin-bottom: 2px; /* 아래쪽 여백 추가 */
+    aspect-ratio: 3/5;
+    margin-bottom: 20px;
+    animation-name: fadeIn;
+    animation-duration: 0.5s;
+    animation-timing-function: ease-out;
+    animation-fill-mode: forwards;
 }
 
+/* 카드 이미지 스타일 */
 .card-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 3px; /* 카드 모서리 더 작게 */
+    display: block;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
     cursor: pointer;
-    transition: transform 0.2s; /* 트랜지션 속도 빠르게 */
 }
 
 .card-item img:hover {
-    transform: scale(1.03); /* 확대 효과 줄임 */
+    transform: scale(1.03);
 }
 
 .card-number {
@@ -133,24 +141,26 @@ img {
     justify-content: center;
     align-items: center;
     height: 100%;
-    min-height: 40px; /* 카드 번호 영역 크기 축소 */
-    font-size: 1rem; /* 폰트 크기 축소 */
+    min-height: 40px;
+    font-size: 1rem;
     font-weight: bold;
     color: #666;
 }
 
 /* 선택된 카드 섹션 */
 .selected-cards-list {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 4px;
+    padding-bottom: 20px;
 }
 
 .selected-card {
     position: relative;
-    max-width: 100%;
-    width: 280px;  /* 모바일에서 더 큰 크기로 표시 */
-    margin: 0 auto;
+    width: 100%;
+    margin: 0;
+    aspect-ratio: 3/5;
+    perspective: 1000px;
 }
 
 .selected-card img {
@@ -159,12 +169,38 @@ img {
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
+.card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.card-back {
+    transform: rotateY(0deg);
+}
+
+.card-front {
+    transform: rotateY(180deg);
+}
+
+.flipped .card-back {
+    transform: rotateY(180deg);
+}
+
+.flipped .card-front {
+    transform: rotateY(0deg);
+}
+
 .card-position {
     position: absolute;
-    top: 10px;
-    left: 10px;
-    width: 30px;
-    height: 30px;
+    top: 5px;
+    left: 5px;
+    width: 20px;
+    height: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -172,7 +208,8 @@ img {
     color: white;
     border-radius: 50%;
     font-weight: bold;
-    font-size: 1rem;
+    font-size: 0.75rem;
+    z-index: 10;
 }
 
 /* 공유 섹션 */
@@ -184,12 +221,25 @@ img {
     margin-bottom: 20px;
 }
 
+/* 공유 버튼 깜빡임 효과 */
+@keyframes blink {
+    0% {
+        background-color: #9acd32; /* 연두색 */
+    }
+    50% {
+        background-color: #558b2f; /* 진한 녹색 */
+    }
+    100% {
+        background-color: #9acd32; /* 연두색 */
+    }
+}
+
 .share-button {
     background-color: #9acd32;
     color: white;
     border: none;
-    padding: 15px 30px;  /* 버튼 크기 키움 */
-    font-size: 1.1rem;
+    padding: 8px 16px;
+    font-size: 0.9rem;
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s;
@@ -197,6 +247,11 @@ img {
 
 .share-button:hover {
     background-color: #8bb92d;
+}
+
+/* 깜빡임 효과가 적용된 버튼 */
+.share-button.blinking {
+    animation: blink 2s infinite ease-in-out; /* 2초마다 천천히 깜빡임 */
 }
 
 /* 유틸리티 클래스 */
@@ -217,29 +272,38 @@ img {
     .cards-grid {
         grid-template-columns: repeat(6, 1fr);
         gap: 8px;
-        padding-bottom: 30px; /* 태블릿에서 하단 여백 늘림 */
+        padding-bottom: 30px;
     }
     
-    /* 태블릿에서도 카드는 1열로 크게 유지 */
     .selected-card {
-        width: 350px;
+        width: 100%;
     }
     
     .section-header {
-        font-size: 1rem; /* 태블릿에서는 글꼴 크기 복원 */
+        font-size: 1rem;
     }
     
     .container {
-        padding: 15px; /* 태블릿에서 패딩 중간 크기로 */
+        padding: 15px;
     }
     
-    section {
-        margin-bottom: 35px;
-        padding: 20px; /* 태블릿에서 패딩 복원 */
+    .section-header {
+        font-size: 1rem;
+    }
+    
+    .share-button {
+        padding: 10px 20px;
+        font-size: 1rem;
+    }
+    
+    .card-position {
+        width: 24px;
+        height: 24px;
+        font-size: 0.85rem;
     }
     
     .card-selection {
-        margin-bottom: 80px; /* 태블릿에서 섹션 간 간격 늘림 */
+        margin-bottom: 80px;
     }
 }
 
@@ -248,45 +312,120 @@ img {
     .cards-grid {
         grid-template-columns: repeat(6, 1fr);
         gap: 10px;
-        padding-bottom: 40px; /* 데스크탑에서 하단 여백 원래대로 */
+        padding-bottom: 40px;
     }
     
-    /* 데스크탑에서는 화면이 넓을 때만 2열 배치 */
     .selected-cards-list {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 30px;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 10px;
     }
     
     .selected-card {
-        width: 300px;
-        margin: 0 auto;
+        width: 100%;
+        margin: 0;
     }
     
     .section-header {
-        font-size: 1.1rem; /* 데스크탑에서는 글꼴 크기 키움 */
+        font-size: 1.1rem;
     }
     
     .container {
-        padding: 20px; /* 데스크탑에서 패딩 원래대로 */
-    }
-    
-    section {
-        margin-bottom: 40px;
+        padding: 20px;
     }
     
     .card-selection {
-        margin-bottom: 100px; /* 데스크탑에서 섹션 간 간격 원래대로 */
+        margin-bottom: 100px;
+    }
+    
+    .share-button {
+        padding: 12px 24px;
+        font-size: 1.1rem;
+    }
+    
+    .card-position {
+        width: 28px;
+        height: 28px;
+        font-size: 0.95rem;
     }
 }
 
 /* 큰 화면 */
 @media screen and (min-width: 1400px) {
     .selected-cards-list {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(6, 1fr);
     }
     
     .selected-card {
-        width: 320px;
+        width: 100%;
     }
+}
+
+/* 초기 카드 클릭 이미지 중앙 정렬 */
+.initial-click-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 빈 선택 메시지 */
+.empty-selection-message {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    font-style: italic;
+}
+
+/* 애니메이션 효과 - 순차적으로 나타나는 효과 */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* 커스텀 알림창 스타일 */
+.custom-alert {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    z-index: 1000;
+    max-width: 90%;
+    width: 300px;
+    text-align: center;
+}
+
+.custom-alert-message {
+    margin-bottom: 20px;
+    font-size: 1rem;
+}
+
+.custom-alert-button {
+    background-color: #9acd32;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.custom-alert-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 999;
 } 
