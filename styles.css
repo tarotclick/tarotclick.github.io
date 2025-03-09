@@ -491,7 +491,7 @@ img {
 
 /* 애니메이션 효과 - 순차적으로 나타나는 효과 */
 @keyframes fadeIn {
-    0% {
+    100% {
         opacity: 1;
         transform: scale(1) translateY(0);
     }
