@@ -256,7 +256,7 @@ function displayCards() {
   const shuffledCardIds = shuffleArray(cardIds);
   
   // 애니메이션 딜레이 설정 (각 카드마다 0.05초씩 증가)
-  const delayIncrement = 0.06; // 카드마다 0.06초씩 증가
+  const delayIncrement = 0.05; // 카드마다 0.05초씩 증가
   
   // 무작위로 섞인 카드를 하나씩 순차적으로 추가
   shuffledCardIds.forEach((i, index) => {
