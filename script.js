@@ -311,7 +311,7 @@ function updateSelectedCardsDisplay(withAnimation = false) {
   if (state.selectedCards.length === 0) {
     const emptyMessage = document.createElement('p');
     emptyMessage.className = 'empty-selection-message';
-    emptyMessage.textContent = '아래 \'카드 선택하기\'에서 이미지를 클릭하여 카드를 펼치고 선택하세요. 선택한 카드는 이곳에 나열됩니다.';
+    emptyMessage.textContent = '아래 \'카드 선택하기\'에서 이미지를 클릭하여 카드를 펼치세요. 선택한 카드는 이곳에 나열됩니다.';
     selectedCardsContainer.appendChild(emptyMessage);
     return;
   }
