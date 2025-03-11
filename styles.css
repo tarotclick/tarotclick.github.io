@@ -40,46 +40,42 @@ img {
 .welcome-section {
     padding: 30px;
     background-color: #f0f8ff;
-}
-
-/* 로고와 제목 컨테이너 */
-.logo-title-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
+    text-align: center;
 }
 
 /* 로고 컨테이너 및 이미지 스타일 */
 .logo-container {
     display: flex;
     align-items: center;
+    justify-content: center;
 }
 
 .site-logo {
-    width: 120px;
+    width: 180px;
     height: auto;
     transition: transform 0.3s ease;
+    margin: 10px 0;
 }
 
 .site-logo:hover {
     transform: scale(1.05);
 }
 
-/* 반응형 로고 및 타이틀 */
+/* 반응형 로고 */
 @media screen and (max-width: 767px) {
-    .logo-title-container {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
     .site-logo {
-        width: 100px;
-        margin-bottom: 10px;
+        width: 140px;
     }
     
-    .welcome-section h1 {
-        font-size: 1.5rem;
+    .welcome-section {
+        padding: 20px;
+    }
+}
+
+/* 태블릿 크기에서의 로고 */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+    .site-logo {
+        width: 160px;
     }
 }
 
