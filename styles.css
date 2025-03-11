@@ -38,9 +38,49 @@ img {
 
 /* 헤더 섹션 */
 .welcome-section {
-    text-align: center;
     padding: 30px;
     background-color: #f0f8ff;
+}
+
+/* 로고와 제목 컨테이너 */
+.logo-title-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+/* 로고 컨테이너 및 이미지 스타일 */
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.site-logo {
+    width: 120px;
+    height: auto;
+    transition: transform 0.3s ease;
+}
+
+.site-logo:hover {
+    transform: scale(1.05);
+}
+
+/* 반응형 로고 및 타이틀 */
+@media screen and (max-width: 767px) {
+    .logo-title-container {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .site-logo {
+        width: 100px;
+        margin-bottom: 10px;
+    }
+    
+    .welcome-section h1 {
+        font-size: 1.5rem;
+    }
 }
 
 /* 덱 선택 섹션 */
